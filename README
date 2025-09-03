@@ -1,0 +1,73 @@
+Ecco un README completo per il tuo progetto Python `Troubleshooting Hub`:
+
+---
+
+# Troubleshooting Hub
+
+**Troubleshooting Hub** è un'applicazione desktop basata su Python/Tkinter progettata per facilitare le operazioni di diagnostica e troubleshooting della rete su sistemi Windows. L'interfaccia intuitiva permette di eseguire comandi di rete, monitorare la connettività e visualizzare informazioni di sistema in modo rapido e centralizzato.
+
+---
+
+## Requisiti
+
+* Python 3.8+
+* Windows (alcuni comandi come `ipconfig`, `gpupdate`, `netstat` sono specifici di Windows)
+* Moduli Python standard: `tkinter`, `subprocess`, `threading`, `datetime`
+
+---
+
+## Installazione
+
+1. Clona il repository:
+
+   ```bash
+   git clone <URL_REPOSITORY>
+   ```
+2. Assicurati di avere Python installato:
+
+   ```bash
+   python --version
+   ```
+3. Avvia l'applicazione:
+
+   ```bash
+   python troubleshooting_hub.py
+   ```
+
+---
+
+## Utilizzo
+
+1. Avvia l'applicazione.
+2. Trascina i moduli (post-it) nella posizione desiderata.
+3. Inserisci host e porta per i comandi che lo richiedono.
+4. Clicca sui pulsanti dei comandi per eseguirli.
+5. Monitora l’output nella console integrata.
+6. Utilizza i pulsanti **Pulisci**, **Salva** o **Interrompi** per gestire la console.
+
+---
+
+## Personalizzazione
+
+Puoi modificare i moduli e i comandi direttamente nel dizionario `CONFIG` all’inizio del file:
+
+```python
+CONFIG = {
+    "modules": [
+        {
+            "title": "Test Connettività",
+            "input_host": True,
+            "commands": [
+                {"name": "Ping Google", "cmd": lambda app: f"ping {app.host_entry.get()}"},
+            ],
+        },
+    ],
+}
+```
+
+* `title`: titolo del modulo.
+* `input_host`: richiede un campo per l'host/IP.
+* `input_port`: richiede un campo per la porta.
+* `commands`: lista dei comandi con nome, comando (`str` o `lambda`) e opzionale `continuous` per esecuzioni continue.
+
+---
