@@ -1,7 +1,3 @@
-Ecco un README completo per il tuo progetto Python `Troubleshooting Hub`:
-
----
-
 # Troubleshooting Hub
 
 **Troubleshooting Hub** è un'applicazione desktop basata su Python/Tkinter progettata per facilitare le operazioni di diagnostica e troubleshooting della rete su sistemi Windows. L'interfaccia intuitiva permette di eseguire comandi di rete, monitorare la connettività e visualizzare informazioni di sistema in modo rapido e centralizzato.
