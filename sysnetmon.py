@@ -9,7 +9,7 @@ from datetime import datetime
 CONFIG = {
     "window": {"title": "Troubleshooting Hub", "width_ratio": 0.8, "height_ratio": 0.8},
     "console": {"bg": "#1e1e1e", "fg": "#ffffff"},
-    "postit": {"bg": "#fff9c4", "relief": "raised", "border": 2},  # colore giallo post-it
+    "postit": {"bg": "#fff9c4", "relief": "raised", "border": 2},
     "modules": [
         {
             "title": "Configurazione Rete",
@@ -101,10 +101,8 @@ class Module(tk.Frame):
         super().__init__(parent, bg=CONFIG["postit"]["bg"], relief=CONFIG["postit"]["relief"], bd=CONFIG["postit"]["border"])
         self.app = app
         self.canvas = parent
-        self.place(x=20, y=20)  # pos iniziale
         self._drag_data = {"x": 0, "y": 0}
 
-        # header
         header = tk.Label(self, text=title, bg=CONFIG["postit"]["bg"], font=("Arial", 10, "bold"))
         header.pack(fill=tk.X, pady=2)
 
@@ -152,17 +150,27 @@ class Module(tk.Frame):
         self._drag_data["y"] = event.y
 
     def do_move(self, event):
-        # calcola nuove coordinate
         new_x = self.winfo_x() + event.x - self._drag_data["x"]
         new_y = self.winfo_y() + event.y - self._drag_data["y"]
 
-        # limiti canvas
         cw, ch = self.canvas.winfo_width(), self.canvas.winfo_height()
         fw, fh = self.winfo_width(), self.winfo_height()
 
-        # evita di uscire dai bordi
         new_x = max(0, min(new_x, cw - fw))
         new_y = max(0, min(new_y, ch - fh))
+
+        for widget in self.canvas.winfo_children():
+            if widget is self or not isinstance(widget, Module):
+                continue
+            x1, y1 = widget.winfo_x(), widget.winfo_y()
+            x2, y2 = x1 + widget.winfo_width(), y1 + widget.winfo_height()
+
+            nx1, ny1 = new_x, new_y
+            nx2, ny2 = new_x + fw, new_y + fh
+
+            overlap = not (nx2 <= x1 or nx1 >= x2 or ny2 <= y1 or ny1 >= y2)
+            if overlap:
+                return
 
         self.place(x=new_x, y=new_y)
 
@@ -184,9 +192,35 @@ class TroubleshootingHub:
         self.console = Console(right, self)
         self.console.pack(fill=tk.BOTH, expand=True)
 
-        for i, m in enumerate(CONFIG["modules"]):
+        self.modules = []
+
+        self.root.after(100, self.place_modules)
+
+    def place_modules(self):
+        self.left.update_idletasks()
+        canvas_width = self.left.winfo_width()
+
+        current_x, current_y = 0, 0
+        max_row_height = 0
+
+        for m in CONFIG["modules"]:
             mod = Module(self.left, self, m["title"], m["commands"], m.get("input_host", False), m.get("input_port", False))
-            mod.place(x=30 + i*40, y=30 + i*40)  # distribuiti
+            mod.update_idletasks()
+
+            fw, fh = mod.winfo_reqwidth(), mod.winfo_reqheight()
+
+            if current_x + fw > canvas_width:
+                current_x = 0
+                current_y += max_row_height
+                max_row_height = 0
+
+            mod.place(x=current_x, y=current_y)
+            self.modules.append(mod)
+
+            current_x += fw
+            max_row_height = max(max_row_height, fh)
+
+        self.left.update_idletasks()
 
     def run_command(self, cmd):
         if self.process: return
