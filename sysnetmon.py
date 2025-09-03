@@ -159,20 +159,35 @@ class Module(tk.Frame):
         new_x = max(0, min(new_x, cw - fw))
         new_y = max(0, min(new_y, ch - fh))
 
+        final_x, final_y = self.winfo_x(), self.winfo_y()
+
+        # -------- Asse X -------- #
+        blocked_x = False
         for widget in self.canvas.winfo_children():
             if widget is self or not isinstance(widget, Module):
                 continue
             x1, y1 = widget.winfo_x(), widget.winfo_y()
             x2, y2 = x1 + widget.winfo_width(), y1 + widget.winfo_height()
+            if not (new_x + fw <= x1 or new_x >= x2 or self.winfo_y() + fh <= y1 or self.winfo_y() >= y2):
+                blocked_x = True
+                break
+        if not blocked_x:
+            final_x = new_x
 
-            nx1, ny1 = new_x, new_y
-            nx2, ny2 = new_x + fw, new_y + fh
+        # -------- Asse Y -------- #
+        blocked_y = False
+        for widget in self.canvas.winfo_children():
+            if widget is self or not isinstance(widget, Module):
+                continue
+            x1, y1 = widget.winfo_x(), widget.winfo_y()
+            x2, y2 = x1 + widget.winfo_width(), y1 + widget.winfo_height()
+            if not (final_x + fw <= x1 or final_x >= x2 or new_y + fh <= y1 or new_y >= y2):
+                blocked_y = True
+                break
+        if not blocked_y:
+            final_y = new_y
 
-            overlap = not (nx2 <= x1 or nx1 >= x2 or ny2 <= y1 or ny1 >= y2)
-            if overlap:
-                return
-
-        self.place(x=new_x, y=new_y)
+        self.place(x=final_x, y=final_y)
 
 # ==========================
 # APP PRINCIPALE
